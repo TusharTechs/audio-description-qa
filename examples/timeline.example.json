@@ -1,0 +1,23 @@
+{
+  "media": "content.mp4",
+  "cues": [
+    {
+      "t": 9.98,
+      "pcm": "desc-01.pcm",
+      "text": "Inside a tent",
+      "duration": 0.993
+    },
+    {
+      "t": 14.82,
+      "pcm": "desc-07.pcm",
+      "text": "A red-haired girl watches.",
+      "duration": 1.559
+    },
+    {
+      "t": 23.7,
+      "pcm": "desc-15.pcm",
+      "text": "A hand reaches",
+      "duration": 0.979
+    }
+  ]
+}
