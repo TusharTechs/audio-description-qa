@@ -160,8 +160,25 @@ are measured against.
 
 Extracted from [Sightline](https://github.com/TusharTechs/sightline), which
 generates audio description for content that has none and speaks it on a Fire
-TV. Nothing here is specific to that project or to any device — it applies to
-any pipeline that writes description automatically.
+TV, and released separately in September 2026 during the Build, Ship, Shape:
+Amazon Developer Hackathon 2026. Nothing here is specific to that project or to
+any device. It applies to any pipeline that writes description automatically.
+
+[Three minutes of the parent project working](https://youtu.be/vqJsFDnj7ko), if
+you want to see what these checks are protecting.
+
+**On the checks themselves.** The descriptions in the parent project are
+written by a vision language model. These checks exist because a model will
+produce a line that reads perfectly and is false, and the person who most needs
+the description is the one person who cannot catch it. Two blind reviewers
+found the faults; the checks are what stops them coming back.
+
+## Portability
+
+Pure Python, 3.10 or newer, with no platform specific calls. Runs on macOS,
+Linux and Windows. `audio_events` and `stability` shell out to `ffmpeg`, which
+needs to be on your `PATH`; the other tools need only the standard library and
+`numpy`.
 
 ## Licence
 
