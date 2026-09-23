@@ -5,3 +5,14 @@ build/
 dist/
 *.egg-info/
 .DS_Store
+
+# Certificates and keys. Nothing TLS related belongs in this repository.
+*.pem
+*.crt
+*.cer
+*.der
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
