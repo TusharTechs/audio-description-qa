@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "audio-description-qa"
-version = "0.1.0"
+version = "0.2.0"
 description = "Quality checks for machine-written audio description"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "Tushar Agarwal" }]
-keywords = ["audio-description", "accessibility", "blind", "a11y", "video"]
+keywords = ["audio-description", "accessibility", "blind", "a11y", "video", "sign-language"]
 classifiers = [
   "Intended Audience :: Developers",
   "Topic :: Multimedia :: Video",
@@ -19,6 +19,9 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
 
 [project.urls]
 Homepage = "https://github.com/TusharTechs/audio-description-qa"

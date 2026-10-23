@@ -47,7 +47,7 @@ direction. The cause was not the classifier: the audio loader was reading
 ### `preflight` — check a described bundle before anyone hears it
 
 ```bash
-python -m adqa.preflight BUNDLE_DIR --gaps gaps.json
+python -m adqa.preflight BUNDLE_DIR [--gaps gaps.json] [--media-duration SECONDS]
 ```
 
 Non-zero exit if anything fails, so it can gate a deploy. It reports:
@@ -57,11 +57,17 @@ Non-zero exit if anything fails, so it can gate a deploy. It reports:
   not blamed for leaving nowhere to speak
 - a cue whose audio file is missing, which plays as silence and is
   indistinguishable from nothing having happened
-- description that overlaps dialogue, or crowds it on either side
-- camera language: "from above", "past us", "we see". `off screen` and
-  `out of shot` are deliberately **not** flagged, because naming the unseen
-  source of a sound is the correct thing to say
-- the same person introduced indefinitely twice
+- cues that overlap one another, or description that overlaps dialogue or
+  crowds it on either side (`< 0.5s` after a line ends or `< 0.2s` before the
+  next begins)
+- camera language: "from above", "past us", "we see", "watches her sleep".
+  `off screen` and `out of shot` are deliberately **not** flagged, because
+  naming the unseen source of a sound is the correct thing to say
+- the same person introduced indefinitely twice ("a woman" and later "a woman"
+  again)
+- **sign-language wrapper repetition**: repeating `"She signs..."` or `"He signs..."`
+  across multiple cues instead of establishing signing once and voicing the
+  signed meaning directly in natural first-person speech
 
 ### `stability` — does the same film get the same answers twice?
 
@@ -126,26 +132,53 @@ decays into whatever is underneath it.
 
 ---
 
-## Install
+## Install & Quick Try
 
 Python 3.10+, `numpy`, and `ffmpeg` on the path.
 
 ```bash
 git clone https://github.com/TusharTechs/audio-description-qa
 cd audio-description-qa
-pip install -e .
+pip install -e ".[dev]"
+```
+
+Run the included self-contained examples immediately (no media file required):
+
+```bash
+# 1. Passing audio-description + sign-language bundle (exit code 0)
+python -m adqa.preflight examples/valid-bundle
+
+# 2. Broken bundle reproducing all reviewer-discovered faults (exit code 1)
+python -m adqa.preflight examples/broken-bundle --gaps examples/broken-bundle/gaps.json
+
+# 3. Run the unit test suite
+pytest -v
+```
+
+Or call `adqa` directly from Python in your generation pipeline:
+
+```python
+from adqa import check_bundle, analyse, worth_checking, describe_for_prompt
+
+report = check_bundle("examples/valid-bundle")
+assert report["passed"], report["failures"]
+
+info = analyse("film.mp4", start=12.0, end=18.0)
+hits = worth_checking(info["onsets"], n=2)
+prompt_context = describe_for_prompt(info, dialogue="")
 ```
 
 ## The bundle format
 
 `preflight` reads a `timeline.json` describing what will be spoken and when.
-See [`examples/timeline.example.json`](examples/timeline.example.json):
+See [`examples/valid-bundle/timeline.json`](examples/valid-bundle/timeline.json) and [`examples/timeline.example.json`](examples/timeline.example.json):
 
 ```json
 {
   "media": "content.mp4",
+  "duration_s": 24.0,
   "cues": [
-    { "t": 9.98, "text": "Inside a tent", "duration": 0.993, "pcm": "desc-01.pcm" }
+    { "t": 0.6, "text": "She signs: parents supporting children.", "duration": 2.305, "pcm": "desc-01.pcm", "kind": "sign_language" }
   ]
 }
 ```
@@ -158,20 +191,18 @@ are measured against.
 
 ## Where this came from
 
-Extracted from [Sightline](https://github.com/TusharTechs/sightline), which
-generates audio description for content that has none and speaks it on a Fire
-TV, and released separately in September 2026 during the Build, Ship, Shape:
-Amazon Developer Hackathon 2026. Nothing here is specific to that project or to
-any device. It applies to any pipeline that writes description automatically.
-
-[Three minutes of the parent project working](https://youtu.be/vqJsFDnj7ko), if
-you want to see what these checks are protecting.
+Extracted from **Sightline**, which generates audio description and sign-language
+voicing for content that has none and speaks it on a Fire TV (Vega OS), and
+released separately as a standalone MIT-licensed package during the Build, Ship,
+Shape: Amazon Developer Hackathon 2026. Nothing here is specific to that project
+or to any device. It applies to any pipeline that writes description automatically.
 
 **On the checks themselves.** The descriptions in the parent project are
 written by a vision language model. These checks exist because a model will
 produce a line that reads perfectly and is false, and the person who most needs
-the description is the one person who cannot catch it. Two blind reviewers
-found the faults; the checks are what stops them coming back.
+the description is the one person who cannot catch it. Blind reviewers on the
+ACB Audio Description Project (ADP) list and r/blind found the faults; the
+checks are what stops them coming back.
 
 ## Portability
 

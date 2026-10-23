@@ -1,0 +1,30 @@
+{
+  "media": "content.mp4",
+  "duration_s": 180.0,
+  "cues": [
+    {
+      "t": 9.98,
+      "pcm": "desc-01.pcm",
+      "text": "A woman enters a tent. She signs: welcome home.",
+      "duration": 2.1
+    },
+    {
+      "t": 18.2,
+      "pcm": "desc-02.pcm",
+      "text": "Seen from above, someone watches her sleep as the camera pans left.",
+      "duration": 3.2
+    },
+    {
+      "t": 28.5,
+      "pcm": "desc-03.pcm",
+      "text": "A woman reaches for the lantern. She signs: stay quiet.",
+      "duration": 2.4
+    },
+    {
+      "t": 42.0,
+      "pcm": "desc-99.pcm",
+      "text": "Footsteps echo outside the tent.",
+      "duration": 1.8
+    }
+  ]
+}

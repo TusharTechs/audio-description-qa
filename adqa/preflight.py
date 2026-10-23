@@ -30,7 +30,7 @@ MIN_BEFORE_SPEECH_S = 0.2
 REPEAT_WORDS = 4
 
 
-def check(bundle, gaps_path=None):
+def check(bundle, gaps_path=None, media_duration=None):
     tl = json.load(open(os.path.join(bundle, "timeline.json")))
     cues = sorted(tl["cues"], key=lambda c: c["t"])
     fails, notes = [], []
@@ -38,7 +38,7 @@ def check(bundle, gaps_path=None):
     if not cues:
         return ["no cues at all"], []
 
-    dur = tl.get("duration_s")
+    dur = media_duration if media_duration is not None else tl.get("duration_s")
     if dur is None and gaps_path and os.path.exists(gaps_path):
         dur = json.load(open(gaps_path)).get("duration_s")
 
@@ -52,9 +52,9 @@ def check(bundle, gaps_path=None):
     # nothing wrong with it.
     #
     # So a hole counts only if the gaps inside it could have held something.
-    gaps = []
+    gaps = tl.get("gaps", [])
     if gaps_path and os.path.exists(gaps_path):
-        gaps = json.load(open(gaps_path)).get("gaps", [])
+        gaps = json.load(open(gaps_path)).get("gaps", gaps)
 
     def room_between(lo, hi):
         """Seconds of describable gap inside a stretch."""
@@ -62,6 +62,8 @@ def check(bundle, gaps_path=None):
 
     last = 0.0
     for c in cues:
+        if c["t"] + 0.05 < last:
+            fails.append(f"cue at {c['t']}s overlaps previous cue ending at {last:.2f}s")
         if c["t"] - last > MAX_SILENCE_S:
             room = room_between(last, c["t"])
             if not gaps or room > MIN_WASTED_ROOM_S:
@@ -145,7 +147,7 @@ def check(bundle, gaps_path=None):
     camera = re.compile(
         r"\b(from above|from below|the camera|pans?|panning|zooms?|close[- ]up|"
         r"cuts? to|we see|past us|toward us|at us|the shot|in frame|"
-        r"camera angle|framing)\b", re.I)
+        r"camera angle|framing|watches her sleep)\b", re.I)
     for c in cues:
         d = c.get("description") or c.get("text", "")
         m = camera.search(d)
@@ -156,23 +158,54 @@ def check(bundle, gaps_path=None):
     # 6. Repeated phrases across the run.
     grams = Counter()
     for c in cues:
-        w = re.findall(r"[a-z']+", (c.get("description") or c.get("text","")).lower())
+        w = re.findall(r"[a-z']+", (c.get("description") or c.get("text", "")).lower())
         for i in range(len(w) - REPEAT_WORDS + 1):
             grams[" ".join(w[i:i + REPEAT_WORDS])] += 1
     for phrase, n in grams.items():
         if n > 1:
             notes.append(f'"{phrase}" said {n} times')
 
+    # 7. Sign-language wrapper repetition.
+    #
+    # Establishing once that a speaker is signing ("She signs: ...") sets the
+    # medium; repeating "She signs:" before every sentence forces a blind
+    # viewer to hear a meta-label on every cue instead of the message itself.
+    sign_wrappers = [
+        c["t"] for c in cues
+        if re.search(r"(^\s*|\b)(she|he|they|the\s+\w+)\s+signs?\b",
+                     (c.get("description") or c.get("text", "")), re.I)
+    ]
+    if len(sign_wrappers) > 1:
+        notes.append(
+            f'sign-language wrapper ("She/He signs...") repeated {len(sign_wrappers)} '
+            f'times (at {", ".join(f"{t}s" for t in sign_wrappers)}) -- '
+            f'establish signing once, then voice the signed meaning directly'
+        )
+
     return fails, notes
+
+
+def check_bundle(bundle, gaps_path=None, media_duration=None):
+    """Structured dictionary wrapper around check() for Python callers."""
+    tl = json.load(open(os.path.join(bundle, "timeline.json")))
+    fails, notes = check(bundle, gaps_path=gaps_path, media_duration=media_duration)
+    return {
+        "passed": len(fails) == 0,
+        "cues": len(tl.get("cues", [])),
+        "failures": fails,
+        "notes": notes,
+    }
 
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("bundle")
     p.add_argument("--gaps")
+    p.add_argument("--media-duration", type=float, default=None,
+                   help="override or supply media duration in seconds")
     a = p.parse_args()
 
-    fails, notes = check(a.bundle, a.gaps)
+    fails, notes = check(a.bundle, a.gaps, media_duration=a.media_duration)
     tl = json.load(open(os.path.join(a.bundle, "timeline.json")))
     print(f"  {len(tl['cues'])} cues in {a.bundle}")
     for n in notes:

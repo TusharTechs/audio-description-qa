@@ -1,0 +1,52 @@
+{
+  "media": "clip.mp4",
+  "duration_s": 24.0,
+  "gaps": [
+    {
+      "start": 0.4,
+      "end": 4.8
+    },
+    {
+      "start": 5.2,
+      "end": 10.0
+    },
+    {
+      "start": 10.2,
+      "end": 16.5
+    },
+    {
+      "start": 17.0,
+      "end": 23.5
+    }
+  ],
+  "cues": [
+    {
+      "t": 0.6,
+      "pcm": "desc-01.pcm",
+      "text": "She signs: parents supporting children.",
+      "duration": 2.305,
+      "kind": "sign_language"
+    },
+    {
+      "t": 5.4,
+      "pcm": "desc-02.pcm",
+      "text": "On screen: Amy E. Peterson, Certified Deaf Interpreter.",
+      "duration": 4.015,
+      "kind": "written_sign"
+    },
+    {
+      "t": 10.3,
+      "pcm": "desc-03.pcm",
+      "text": "Working together as a team, we follow the same rules and support one another.",
+      "duration": 4.135,
+      "kind": "sign_language"
+    },
+    {
+      "t": 17.2,
+      "pcm": "desc-04.pcm",
+      "text": "Stress builds up, so think about what you need and give yourself a break.",
+      "duration": 3.881,
+      "kind": "sign_language"
+    }
+  ]
+}
