@@ -1,6 +1,10 @@
 # audio-description-qa
 
-Quality checks for **machine-written audio description** — the spoken track
+[![CI](https://github.com/TusharTechs/audio-description-qa/actions/workflows/ci.yml/badge.svg)](https://github.com/TusharTechs/audio-description-qa/actions/workflows/ci.yml)
+[![MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-informational)](#install--quick-try)
+
+Quality checks for **machine-written audio description** and **sign-language voicing** — the spoken track
 that describes what is happening on screen for blind and low vision viewers.
 
 Generating description with a model is the easy part. Knowing whether what
@@ -9,6 +13,10 @@ picture is the hard part, and that is what these four tools are for.
 
 Every check here exists because a blind reviewer found the fault it now
 catches. None of them were found by testing locally.
+
+[![audio-description-qa overview video](docs/demo-thumbnail.jpg)](https://youtu.be/w2UKKdmRgGI)
+
+**[▶ Watch the 80-second overview video](https://youtu.be/w2UKKdmRgGI)**
 
 ---
 
@@ -196,6 +204,9 @@ voicing for content that has none and speaks it on a Fire TV (Vega OS), and
 released separately as a standalone MIT-licensed package during the Build, Ship,
 Shape: Amazon Developer Hackathon 2026. Nothing here is specific to that project
 or to any device. It applies to any pipeline that writes description automatically.
+
+- **[▶ Watch the 80-second `audio-description-qa` explainer video](https://youtu.be/w2UKKdmRgGI)**
+- **[▶ Watch three minutes of the parent project working](https://youtu.be/oK298w3dh9E)**, if you want to see what these checks are protecting.
 
 **On the checks themselves.** The descriptions in the parent project are
 written by a vision language model. These checks exist because a model will
